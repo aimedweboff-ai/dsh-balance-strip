@@ -1,0 +1,95 @@
+{
+  "format": 1,
+  "title": {
+    "en": "aimedweboff-ai plugins",
+    "ru": "Плагины aimedweboff-ai"
+  },
+  "description": {
+    "en": "Small, focused plugins for the DeepSeek Harness Web GUI.",
+    "ru": "Небольшие плагины для Web-интерфейса DeepSeek Harness."
+  },
+  "metadata": {
+    "categories": {
+      "monitoring": {
+        "title": {
+          "en": "Monitoring and usage",
+          "ru": "Мониторинг и расходы"
+        }
+      }
+    },
+    "labels": {
+      "account": {
+        "title": {
+          "en": "Account",
+          "ru": "Аккаунт"
+        }
+      },
+      "free": {
+        "title": {
+          "en": "Free",
+          "ru": "Бесплатно"
+        }
+      }
+    },
+    "sortKeys": {
+      "added": {
+        "title": {
+          "en": "Added",
+          "ru": "Добавлено"
+        },
+        "order": "desc"
+      }
+    }
+  },
+  "plugins": [
+    {
+      "name": "dsh-balance-strip",
+      "title": {
+        "en": "Balance strip",
+        "ru": "Полоса баланса"
+      },
+      "description": {
+        "en": "Always-visible account balance, session input/output token counters, and an estimate of the session's spend in the frame's bottom bar.",
+        "ru": "Баланс аккаунта, счётчики входящих и исходящих токенов сессии и оценка её стоимости — всегда на виду в нижней полосе окна."
+      },
+      "icon": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA2NCA2NCI+PHJlY3Qgd2lkdGg9IjY0IiBoZWlnaHQ9IjY0IiByeD0iMTQiIGZpbGw9IiMxZjZmZWIiLz48cGF0aCBkPSJNMjAgMTdsMTIgMTcgMTItMTdNMzIgMzR2MTRNMjMgMzhoMThNMjMgNDVoMTgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iI2ZmZiIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48L3N2Zz4=",
+      "author": "aimedweboff-ai",
+      "homepage": "https://github.com/aimedweboff-ai/dsh-balance-strip#readme",
+      "repository": {
+        "url": "https://github.com/aimedweboff-ai/dsh-balance-strip"
+      },
+      "metadata": {
+        "category": "monitoring",
+        "keywords": [
+          "balance",
+          "tokens",
+          "cost",
+          "usage",
+          "account",
+          "status bar"
+        ],
+        "labels": [
+          "account",
+          "free"
+        ],
+        "sortKeys": {
+          "added": 1795594560
+        }
+      },
+      "versions": [
+        {
+          "version": "0.2.0",
+          "publishTimestamp": 1795594560,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/aimedweboff-ai/dsh-balance-strip",
+            "commit": "5f1214b925580f1176fa9b8666eb6096c5d06dd6"
+          },
+          "engines": {
+            "dsh": ">=0.1.7-0"
+          }
+        }
+      ]
+    }
+  ]
+}

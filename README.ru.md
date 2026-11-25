@@ -40,6 +40,16 @@
 
 Плагина нет в npm: установка — копирование каталога и одна строка в Loader.
 
+### Из маркета плагинов DSH
+
+Плагин есть в собственном индексе маркета:
+
+```text
+https://raw.githubusercontent.com/aimedweboff-ai/dsh-balance-strip/main/market/index.json
+```
+
+В DSH откройте **Плагины → Discover**, добавьте этот адрес через **Add index source** (или через меню маркета → **Manage index sources…**), выберите маркет *aimedweboff-ai plugins* и нажмите **Install** на карточке Balance strip. Для Discover нужны строки `plugin-market` и `ui-plugin-market` — они есть в DSH, но не входят в профиль по умолчанию; в [`market/README.md`](market/README.md) показана вставка из двух строк, которая их включает.
+
 ### 1. Скопировать пакет в профиль
 
 ```powershell

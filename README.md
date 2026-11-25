@@ -40,6 +40,16 @@ The strip reports on the running session; when nothing is running it uses the mo
 
 The plugin is not published on npm; installation is a directory copy plus one Loader row.
 
+### From the DSH plugin market
+
+The plugin is listed in its own market index:
+
+```text
+https://raw.githubusercontent.com/aimedweboff-ai/dsh-balance-strip/main/market/index.json
+```
+
+In DSH open **Plugins → Discover**, add that URL through **Add index source** (or the market menu's **Manage index sources…**), pick the *aimedweboff-ai plugins* market, and press **Install** on the Balance strip card. Discover needs the `plugin-market` and `ui-plugin-market` rows, which ship with DSH but stay out of the default profile; [`market/README.md`](market/README.md) shows the two-row insert that enables them.
+
 ### 1. Copy the package into your profile
 
 ```powershell
