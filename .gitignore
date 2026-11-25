@@ -1,0 +1,12 @@
+node_modules/
+*.log
+
+# preview build intermediates
+dark.png
+light.png
+
+# OS / editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

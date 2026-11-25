@@ -1,0 +1,57 @@
+{
+  "name": "dsh-balance-strip",
+  "version": "0.2.0",
+  "description": "Always-visible DeepSeek account balance, session token counters, and estimated session spend for the DeepSeek Harness Web GUI",
+  "type": "module",
+  "license": "MIT",
+  "private": true,
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "engines": {
+    "dsh": ">=0.1.7-0"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "balance",
+    "tokens",
+    "cost"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aimedweboff-ai/dsh-balance-strip.git"
+  },
+  "homepage": "https://github.com/aimedweboff-ai/dsh-balance-strip#readme",
+  "bugs": {
+    "url": "https://github.com/aimedweboff-ai/dsh-balance-strip/issues"
+  },
+  "scripts": {
+    "test": "node test/smoke.mjs"
+  },
+  "files": [
+    "lib",
+    "README.md",
+    "README.ru.md",
+    "LICENSE"
+  ],
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "*"
+  },
+  "dsh": {
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-api-remotes"
+      ],
+      "platform": "web"
+    }
+  }
+}
