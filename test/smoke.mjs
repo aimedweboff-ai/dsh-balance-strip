@@ -4,14 +4,14 @@ import path from "node:path";
 
 /**
  * Smoke test for the browser half: it registers through the DSH module loader,
- * exposes the expected slot registration, and turns one synthetic session
- * snapshot into the numbers the strip renders.
+ * declares both slot occupants, and turns a synthetic catalogue into the
+ * numbers the strip renders — including the Session the user switched to.
  */
 const here = path.dirname(fileURLToPath(import.meta.url));
 const pluginDir = path.resolve(here, "..");
 const require = createRequire(path.join(pluginDir, "package.json"));
 
-let registered;
+const registrations = new Map();
 let entry;
 
 globalThis.window = {
@@ -38,7 +38,7 @@ const exports = entry.factory((id) => {
   throw new Error("unexpected module request: " + id);
 });
 
-const { usageOf, formatTokens, formatMoney } = exports.internals;
+const { usageOf, viewedSession, formatTokens, formatMoney } = exports.internals;
 
 const snapshot = {
   ids: ["s-idle", "s-running"],
@@ -47,6 +47,17 @@ const snapshot = {
     "s-running": { id: "s-running", running: true, title: "working chat" },
   },
   projectionsBySession: {
+    "s-idle": {
+      values: {
+        tokenUsage: {
+          uncachedInputTokens: 10,
+          outputTokens: 2,
+          cacheReadTokens: 0,
+          cacheWriteTokens: 0,
+        },
+        modelSelection: { lastUsed: { provider: "deepseek-account", model: "deepseek-v4-pro" } },
+      },
+    },
     "s-running": {
       values: {
         tokenUsage: {
@@ -61,16 +72,41 @@ const snapshot = {
   },
 };
 
-const usage = usageOf(snapshot);
-if (usage.sessionId !== "s-running") throw new Error("running session not preferred");
-if (usage.input !== 901200) throw new Error("input total mismatch: " + usage.input);
-if (usage.output !== 345) throw new Error("output mismatch: " + usage.output);
+// Without a reported Session the strip falls back to the running one.
+const fallback = usageOf(snapshot, null);
+if (fallback.sessionId !== "s-running") throw new Error("running session not preferred");
+if (fallback.input !== 901200) throw new Error("input total mismatch: " + fallback.input);
+if (fallback.output !== 345) throw new Error("output mismatch: " + fallback.output);
 
 const expectedCost = (1200 * 0.3 + 900000 * 0.006 + 345 * 1.2) / 1e6;
-if (Math.abs(usage.cost - expectedCost) > 1e-9) {
-  throw new Error("cost mismatch: " + usage.cost + " vs " + expectedCost);
+if (Math.abs(fallback.cost - expectedCost) > 1e-9) {
+  throw new Error("cost mismatch: " + fallback.cost + " vs " + expectedCost);
 }
-if (usageOf({ ids: [], byId: {} }) !== null) throw new Error("empty catalogue must yield null");
+
+// The Session the Conversation shows wins over the running one.
+const shown = usageOf(snapshot, "s-idle");
+if (shown.sessionId !== "s-idle") throw new Error("shown session not preferred: " + shown.sessionId);
+if (shown.input !== 10 || shown.output !== 2) throw new Error("shown session numbers wrong");
+if (shown.model !== "deepseek-v4-pro") throw new Error("shown session model wrong");
+
+// An uncatalogued Session whose projections are already known still answers.
+const uncatalogued = usageOf({ ids: [], byId: {}, projectionsBySession: snapshot.projectionsBySession }, "s-idle");
+if (uncatalogued === null || uncatalogued.sessionId !== "s-idle") throw new Error("uncatalogued session lost");
+
+// The reporter store publishes and releases identity-safely.
+let notified = 0;
+const stop = viewedSession.subscribe(() => {
+  notified += 1;
+});
+viewedSession.report("s-idle");
+if (viewedSession.get() !== "s-idle" || notified !== 1) throw new Error("report did not publish");
+viewedSession.release("s-running");
+if (viewedSession.get() !== "s-idle") throw new Error("foreign release cleared the view");
+viewedSession.release("s-idle");
+if (viewedSession.get() !== null || notified !== 2) throw new Error("release did not publish");
+stop();
+
+if (usageOf({ ids: [], byId: {} }, null) !== null) throw new Error("empty catalogue must yield null");
 if (formatTokens(999) !== "999" || formatTokens(12345) !== "12k" || formatTokens(2500000) !== "2.50M") {
   throw new Error("token formatting mismatch");
 }
@@ -99,21 +135,39 @@ const ctx = {
   slots: {
     inject: (_name, callback) => callback(),
     register: (definition) => {
-      registered = definition;
+      registrations.set(definition.name, definition);
       return () => {};
     },
   },
 };
 
 await exports.apply(ctx);
-if (registered === undefined) throw new Error("nothing registered");
-if (registered.name !== "shell.bottom") throw new Error("wrong slot: " + registered.name);
-if (registered.id !== "balance-strip") throw new Error("wrong slot id: " + registered.id);
 
-const props = registered.inject();
+const strip = registrations.get("shell.bottom");
+const reporter = registrations.get("conversation.session.header.actions");
+if (strip === undefined) throw new Error("strip not registered");
+if (strip.id !== "balance-strip") throw new Error("wrong slot id: " + strip.id);
+if (reporter === undefined) throw new Error("session reporter not registered");
+if (reporter.id !== "balance-strip-session") throw new Error("wrong reporter id: " + reporter.id);
+if (typeof exports.SessionReporter !== "function") throw new Error("reporter component missing");
+
+const props = strip.inject();
 const balance = await props.readBalance();
 if (balance.value[0].balance !== "42.17") throw new Error("balance read failed");
-if (props.readUsage().cost === null) throw new Error("usage read failed");
-props.subscribeUsage(() => {});
 
-console.log("ok: " + usage.input + " input, " + usage.output + " output, ≈" + formatMoney(usage.cost));
+viewedSession.report("s-idle");
+const live = props.readUsage();
+if (live.sessionId !== "s-idle") throw new Error("readUsage ignored the shown session");
+
+let fired = 0;
+const unsubscribe = props.subscribeUsage(() => {
+  fired += 1;
+});
+viewedSession.report("s-running");
+unsubscribe();
+if (fired === 0) throw new Error("strip not notified by a session switch");
+
+console.log(
+  "ok: fallback " + fallback.sessionId + " (" + fallback.input + " in), shown " + shown.sessionId +
+    " (" + shown.input + " in), ≈" + formatMoney(shown.cost),
+);

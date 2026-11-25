@@ -28,7 +28,7 @@ Session counters follow the live projection feed, so they move while the agent w
 
 ## Which session
 
-The strip reports on the running session; when nothing is running it uses the most recent row of the session catalogue. With two chats open, it follows the one that is actually working.
+The strip reports on the session the Conversation is showing: switching sessions in the sidebar switches the counters with it. A zero-render occupant of `conversation.session.header.actions` publishes the shown Session id, because the bottom slot itself sits outside the Session scope. When no Session is shown (blank home), the strip falls back to the running session, then to the most recent catalogue row.
 
 ## Requirements
 
