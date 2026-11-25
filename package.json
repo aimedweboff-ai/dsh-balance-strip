@@ -1,6 +1,6 @@
 {
   "name": "dsh-balance-strip",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Always-visible DeepSeek account balance, session token counters, and estimated session spend for the DeepSeek Harness Web GUI",
   "type": "module",
   "license": "MIT",
@@ -12,7 +12,8 @@
     "./client": {
       "default": "./lib/client.js"
     },
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./cordis.patch.yml": "./cordis.patch.yml"
   },
   "engines": {
     "dsh": ">=0.1.7-0"
@@ -38,6 +39,7 @@
   },
   "files": [
     "lib",
+    "cordis.patch.yml",
     "README.md",
     "README.ru.md",
     "LICENSE"
@@ -46,6 +48,9 @@
     "@deepseek-ai/cordis": "*"
   },
   "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
     "client": {
       "inject": [
         "@deepseek-ai/dsh-api-remotes"

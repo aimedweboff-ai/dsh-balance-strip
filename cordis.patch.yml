@@ -1,0 +1,5 @@
+# Loader rows this bundle contributes: one no-op Host row. The browser half
+# registered by `dsh.client` draws the strip itself.
+- insert:
+    - id: balance-strip
+      name: dsh-balance-strip

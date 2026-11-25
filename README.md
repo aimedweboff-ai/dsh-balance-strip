@@ -67,17 +67,17 @@ cp -R /tmp/dsh-balance-strip ~/.dsh/profiles/desktop/node_modules/dsh-balance-st
 
 If your profile lives elsewhere, use that path instead — `DSH_HOME` points at the directory that contains `profiles/`.
 
-### 2. Add the Loader row
+### 2. Mount the bundle
 
-Append to `~/.dsh/profiles/desktop/cordis.patch.yml` (create the file with `[]` if it does not exist yet):
+The package ships [`cordis.patch.yml`](cordis.patch.yml), so installing it as a bundle registers its Loader row by itself: **Plugins → Add plugin** with the directory, or `plugin_manager` `install_bundle` with the absolute package directory. Nothing else to edit.
+
+A directory copy that was not installed as a bundle needs the row appended to `~/.dsh/profiles/desktop/cordis.patch.yml` (create the file with `[]` when it does not exist), which is exactly what the shipped patch contains:
 
 ```yaml
 - insert:
     - id: balance-strip
       name: dsh-balance-strip
 ```
-
-The entry is a plain insert: it adds one no-op host row and the browser half registers the strip.
 
 ### 3. Restart DeepSeek Harness
 
