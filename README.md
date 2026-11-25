@@ -2,7 +2,7 @@
 
 A one-line status bar for the [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) Web GUI: **account balance, session token counters, and an estimate of what the session has cost so far** — always visible instead of buried in Settings.
 
-![Preview of the strip in the dark and light themes](docs/preview.png)
+![Rendered mock-up of the strip in the dark and light themes](docs/preview.png)
 
 ```text
 ↑ 901k  ↓ 345   ≈$0.0062   ·   Balance ¥42.17   ·   bonus ¥5.00   ·   2 min ago
