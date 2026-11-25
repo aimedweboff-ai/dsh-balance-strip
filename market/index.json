@@ -78,6 +78,18 @@
       },
       "versions": [
         {
+          "version": "0.2.1",
+          "publishTimestamp": 1795602651,
+          "source": {
+            "type": "git",
+            "url": "https://github.com/aimedweboff-ai/dsh-balance-strip",
+            "commit": "d5b314f9f633751416690e7192c0d827069e5c8e"
+          },
+          "engines": {
+            "dsh": ">=0.1.7-0"
+          }
+        },
+        {
           "version": "0.2.0",
           "publishTimestamp": 1795594560,
           "source": {
