@@ -38,7 +38,7 @@ const exports = entry.factory((id) => {
   throw new Error("unexpected module request: " + id);
 });
 
-const { usageOf, viewedSession, formatTokens, formatMoney } = exports.internals;
+const { usageOf, viewedSession, costOf, formatTokens, formatMoney } = exports.internals;
 
 const snapshot = {
   ids: ["s-idle", "s-running"],
@@ -79,9 +79,20 @@ if (fallback.input !== 901200) throw new Error("input total mismatch: " + fallba
 if (fallback.output !== 345) throw new Error("output mismatch: " + fallback.output);
 
 const expectedCost = (1200 * 0.3 + 900000 * 0.006 + 345 * 1.2) / 1e6;
-if (Math.abs(fallback.cost - expectedCost) > 1e-9) {
-  throw new Error("cost mismatch: " + fallback.cost + " vs " + expectedCost);
+const usdSpend = costOf(fallback, fallback.model, "USD");
+if (Math.abs(usdSpend.cost - expectedCost) > 1e-9) {
+  throw new Error("cost mismatch: " + usdSpend.cost + " vs " + expectedCost);
 }
+
+// Yuan wallets are priced in yuan: the same tokens at the converted rate.
+const cnySpend = costOf(fallback, fallback.model, "CNY");
+if (Math.abs(cnySpend.cost - expectedCost * 7.2) > 1e-9) {
+  throw new Error("CNY cost mismatch: " + cnySpend.cost);
+}
+if (formatMoney(cnySpend.cost, "CNY") !== "¥0.044") {
+  throw new Error("CNY formatting mismatch: " + formatMoney(cnySpend.cost, "CNY"));
+}
+if (formatMoney(usdSpend.cost) !== "$0.0062") throw new Error("USD formatting mismatch");
 
 // The Session the Conversation shows wins over the running one.
 const shown = usageOf(snapshot, "s-idle");
@@ -169,5 +180,5 @@ if (fired === 0) throw new Error("strip not notified by a session switch");
 
 console.log(
   "ok: fallback " + fallback.sessionId + " (" + fallback.input + " in), shown " + shown.sessionId +
-    " (" + shown.input + " in), ≈" + formatMoney(shown.cost),
+    " (" + shown.input + " in), " + formatMoney(usdSpend.cost) + " / " + formatMoney(cnySpend.cost, "CNY"),
 );

@@ -16,7 +16,7 @@ The strip occupies the frame's `shell.bottom` slot — the full-width band under
 |---|---|---|
 | `↑ 901k` | Input tokens of the current session: uncached + cache-read + cache-write | `tokenUsage` session projection |
 | `↓ 345` | Output tokens of the current session | `tokenUsage` projection |
-| `≈$0.0062` | Estimated spend of the session at list prices | token counts × the model's published price |
+| `≈$0.0062` / `≈¥0.044` | Estimated spend of the session, in the wallet's currency | token counts × the model's published price |
 | `Balance ¥42.17` | Wallet funds | `account/getBalance` Remote method, polled once a minute |
 | `bonus ¥5.00` | Bonus credit, shown only when the wallet has any | same read |
 | `2 min ago` | Age of the last successful wallet read | local clock |
@@ -113,6 +113,19 @@ The cost figure is an estimate from a price table in [`lib/client.js`](lib/clien
 cost = (uncachedInput × input + cacheRead × cacheRead
         + cacheWrite × cacheWrite + output × output) / 1 000 000
 ```
+
+### Currency
+
+The spend follows the wallet: a `CNY` wallet shows `≈¥0.044`, a `USD` wallet shows `≈$0.0062`. The shipped catalogue quotes USD only, so yuan rows derive from `USD_TO_CNY` (7.2 by default). When a model's actual yuan list price differs from that conversion, add it to `PRICES_CNY` — an exact entry replaces the conversion for that model:
+
+```js
+const USD_TO_CNY = 7.2
+const PRICES_CNY = {
+  'deepseek-flash': { input: 2.19, output: 8.76, cacheRead: 0.0438, cacheWrite: 0 },
+}
+```
+
+Without a wallet read (signed out, or a provider-only setup) the strip falls back to USD.
 
 An unknown model falls back to `deepseek-flash`. The table is intentionally a few lines of code rather than a settings page: change it in place and restart when DeepSeek changes prices. Model ids come from the session's `modelSelection` projection, so switching models mid-session reprices the whole session total — the number is a running estimate, not an invoice.
 
