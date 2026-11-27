@@ -102,32 +102,34 @@ Delete `node_modules/dsh-balance-strip` from the profile, remove the `balance-st
 
 ## Pricing
 
-The cost figure is an estimate from a price table in [`lib/client.js`](lib/client.js), mirrored from the model catalogue shipped inside DSH (`@earendil-works/pi-ai`), in **USD per 1M tokens**:
+The cost figure is an estimate from the **official DeepSeek list prices**, each bucket given as off-peak / peak (peak is double), per 1M tokens.
 
-| Model | input | cacheRead | cacheWrite | output |
+`deepseek-flash`:
+
+| Currency | input (miss) | input (cache hit) | cacheWrite | output |
 |---|---|---|---|---|
-| `deepseek-flash` | 0.30 | 0.006 | 0 | 1.20 |
-| `deepseek-v4-pro` | 1.32 | 0.044 | 0 | 3.96 |
+| USD | 0.15 / 0.30 | 0.003 / 0.006 | 0 | 0.60 / 1.20 |
+| CNY | 1 / 2 | 0.02 / 0.04 | 0 | 4 / 8 |
+
+`deepseek-v4-pro`:
+
+| Currency | input (miss) | input (cache hit) | cacheWrite | output |
+|---|---|---|---|---|
+| USD | 0.66 / 1.32 | 0.022 / 0.044 | 0 | 1.98 / 3.96 |
+| CNY | 4.5 / 9 | 0.15 / 0.30 | 0 | 13.5 / 27 |
 
 ```text
 cost = (uncachedInput × input + cacheRead × cacheRead
         + cacheWrite × cacheWrite + output × output) / 1 000 000
 ```
 
-### Currency
+**Tariff.** Peak is 01:00–04:00 and 06:00–10:00 UTC, Monday through Friday; every other hour, weekends included, is off-peak at half price. The strip prices the session at the tariff in effect when it renders and names it in the tooltip. Chinese public holidays are not modelled, so a holiday weekday counts as peak.
 
-The spend is shown once per currency the account holds, in wallet order: an account with both wallets reads `≈$0.768 / ¥5.53`, a yuan-only account reads `≈¥5.53`, a dollar-only one `≈$0.768`. The shipped catalogue quotes USD only, so yuan rows derive from `USD_TO_CNY` (7.2 by default). When a model's actual yuan list price differs from that conversion, add it to `PRICES_CNY` — an exact entry replaces the conversion for that model:
-
-```js
-const USD_TO_CNY = 7.2
-const PRICES_CNY = {
-  'deepseek-flash': { input: 2.19, output: 8.76, cacheRead: 0.0438, cacheWrite: 0 },
-}
-```
-
-Without a wallet read (signed out, or a provider-only setup) the strip falls back to USD.
+**Currency.** The spend is shown once per currency the account holds, in wallet order: an account with both wallets reads `≈$0.828 / ¥5.74`, a yuan-only account reads `≈¥5.74`, a dollar-only one `≈$0.828`. Without a wallet read (signed out, or a provider-only setup) the strip falls back to USD.
 
 An unknown model falls back to `deepseek-flash`. The table is intentionally a few lines of code rather than a settings page: change it in place and restart when DeepSeek changes prices. Model ids come from the session's `modelSelection` projection, so switching models mid-session reprices the whole session total — the number is a running estimate, not an invoice.
+
+**Why the estimate can differ from the wallet drop.** `tokenUsage` is one aggregate for the whole session, so the strip cannot split those tokens between peak and off-peak hours; it prices all of them at the current tariff. The wallet also covers every session and every agent run, not just the one on screen.
 
 ## How it works
 

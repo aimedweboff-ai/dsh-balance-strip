@@ -1,6 +1,6 @@
 {
   "name": "dsh-balance-strip",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Always-visible DeepSeek account balance, session token counters, and estimated session spend for the DeepSeek Harness Web GUI",
   "type": "module",
   "license": "MIT",
