@@ -116,7 +116,7 @@ cost = (uncachedInput × input + cacheRead × cacheRead
 
 ### Currency
 
-The spend follows the wallet: a `CNY` wallet shows `≈¥0.044`, a `USD` wallet shows `≈$0.0062`. The shipped catalogue quotes USD only, so yuan rows derive from `USD_TO_CNY` (7.2 by default). When a model's actual yuan list price differs from that conversion, add it to `PRICES_CNY` — an exact entry replaces the conversion for that model:
+The spend is shown once per currency the account holds, in wallet order: an account with both wallets reads `≈$0.768 / ¥5.53`, a yuan-only account reads `≈¥5.53`, a dollar-only one `≈$0.768`. The shipped catalogue quotes USD only, so yuan rows derive from `USD_TO_CNY` (7.2 by default). When a model's actual yuan list price differs from that conversion, add it to `PRICES_CNY` — an exact entry replaces the conversion for that model:
 
 ```js
 const USD_TO_CNY = 7.2

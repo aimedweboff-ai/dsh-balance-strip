@@ -38,7 +38,7 @@ const exports = entry.factory((id) => {
   throw new Error("unexpected module request: " + id);
 });
 
-const { usageOf, viewedSession, costOf, formatTokens, formatMoney } = exports.internals;
+const { usageOf, viewedSession, costOf, formatSpends, formatTokens, formatMoney, walletCurrencies } = exports.internals;
 
 const snapshot = {
   ids: ["s-idle", "s-running"],
@@ -93,6 +93,18 @@ if (formatMoney(cnySpend.cost, "CNY") !== "¥0.044") {
   throw new Error("CNY formatting mismatch: " + formatMoney(cnySpend.cost, "CNY"));
 }
 if (formatMoney(usdSpend.cost) !== "$0.0062") throw new Error("USD formatting mismatch");
+
+// A wallet that holds both currencies shows the spend in both, wallet order first.
+const wallets = {
+  status: "ready",
+  value: [{ currency: "USD", balance: "7.82" }, { currency: "CNY", balance: "9.02" }],
+  bonusWallets: [{ currency: "USD", balance: "0.00" }],
+};
+const currencies = walletCurrencies(wallets);
+if (currencies.join(",") !== "USD,CNY") throw new Error("wallet currencies wrong: " + currencies.join(","));
+const spends = currencies.map((code) => costOf(fallback, fallback.model, code));
+const spendText = formatSpends(spends);
+if (spendText !== "$0.0062 / ¥0.044") throw new Error("multi-currency spend wrong: " + spendText);
 
 // The Session the Conversation shows wins over the running one.
 const shown = usageOf(snapshot, "s-idle");
